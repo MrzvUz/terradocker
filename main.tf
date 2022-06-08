@@ -16,16 +16,14 @@ resource "random_string" "random" {
   special = false
 }
 
-resource "docker_container" "nodered_container" {
+module "container" {
+  source = "./container"
+  depends_on = [null_resource.dockervol]
   count = local.container_count
-  name  = join("-", ["nodered", terraform.workspace, random_string.random[count.index].result])
-  image = module.image.image_output
-  ports {
-    internal = var.internal_port
-    external = var.external_port[terraform.workspace][count.index] # terraform.workspace map key auto deploys on current environment.
-  }
-  volumes {
-    container_path = "/data"
-    host_path      = "${path.cwd}/noderedvol" # path.cwd with string interpolation will provide the full path for the current directory.
-  }
+  name_in  = join("-", ["nodered", terraform.workspace, random_string.random[count.index].result])
+  image_in = module.image.image_out
+  int_port_in = var.internal_port
+  ext_port_in = var.external_port[terraform.workspace][count.index] # terraform.workspace map key auto deploys on current environment.
+  container_path_in = "/data"
+  host_path_in      = "${path.cwd}/noderedvol" # path.cwd with string interpolation will provide the full path for the current directory.
 }

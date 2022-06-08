@@ -1,4 +1,4 @@
 # ./image/outputs.tf
-output "image_output" {
+output "image_out" {
   value = docker_image.nodered_image.latest
 }
