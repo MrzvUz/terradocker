@@ -10,6 +10,10 @@ variable "image" {
       dev  = "quay.io/influxdb/influxdb:v2.0.2"
       prod = "quay.io/influxdb/influxdb:v2.0.2"
     }
+    grafana = {
+      dev  = "grafana/grafana"
+      prod = "grafana/grafana"
+    }
   }
 }
 
@@ -31,14 +35,14 @@ variable "internal_port" {
 variable "external_port" {
   type = map(any)
 
-  validation {
-    condition     = max(var.external_port["dev"]...) <= 65535 && min(var.external_port["dev"]...) >= 1980 # "..." is a spread operator when we use lists.
-    error_message = "The external port for dev must be in the valid port range equal or less than 65535 and equal or greater than 1980."
-  }
+  # validation {
+  #   condition     = max(var.external_port["dev"]...) <= 65535 && min(var.external_port["dev"]...) >= 1980 # "..." is a spread operator when we use lists.
+  #   error_message = "The external port for dev must be in the valid port range equal or less than 65535 and equal or greater than 1980."
+  # }
 
-  validation {
-    condition     = max(var.external_port["prod"]...) < 1980 && min(var.external_port["prod"]...) >= 1880 # "..." is a spread operator when we use lists.
-    error_message = "The external port for prod must be in the valid port range less than 1980 and equal or greater than 1880."
-  }
+  # validation {
+  #   condition     = max(var.external_port["prod"]...) < 1980 && min(var.external_port["prod"]...) >= 1880 # "..." is a spread operator when we use lists.
+  #   error_message = "The external port for prod must be in the valid port range less than 1980 and equal or greater than 1880."
+  # }
 }
 

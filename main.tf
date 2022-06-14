@@ -1,27 +1,17 @@
-module "nodered_image" {
+module "image" {
   source   = "./image"
-  image_in = var.image["nodered"][terraform.workspace]
-}
-
-module "influxdb_image" {
-  source   = "./image"
-  image_in = var.image["influxdb"][terraform.workspace]
-}
-
-resource "random_string" "random" {
-  count   = local.container_count
-  length  = 4
-  upper   = false
-  special = false
+  for_each = local.deployment
+  image_in = each.value.image
 }
 
 module "container" {
   source            = "./container"
-  count             = local.container_count
-  name_in           = join("-", ["nodered", terraform.workspace, random_string.random[count.index].result])
-  image_in          = module.nodered_image.image_out
-  int_port_in       = var.internal_port
-  ext_port_in       = var.external_port[terraform.workspace][count.index] # terraform.workspace map key auto deploys on current environment.
-  container_path_in = "/data"
+  for_each          = local.deployment
+  count_in          = each.value.container_count
+  name_in           = each.key
+  image_in          = module.image[each.key].image_out
+  int_port_in       = each.value.internal
+  ext_port_in       = each.value.external
+  container_path_in = each.value.container_path
   # host_path_in      = "${path.cwd}/noderedvol" # path.cwd with string interpolation will provide the full path for the current directory.
 }
